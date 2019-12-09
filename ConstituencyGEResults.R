@@ -6,6 +6,9 @@ library(tidyr)
 library(data.table)
 library(ggtern)
 
+#Original data comes from http://researchbriefings.files.parliament.uk/documents/CBP-8647/1918-2017election_results_by_pcon.xlsx
+#but need better R-based Excel wrangling than I posses to read that in tidily, so did a little pre-processing within Excel (sorry)
+
 #Read in data
 data <- fread("Data/ConstituencyResults.csv")
 
@@ -22,9 +25,10 @@ data$year <- as.numeric(data$year)
 data$cons <- gsub("&", "AND", data$cons)
 data$cons <- gsub(",", "", data$cons)
 
-#Filter England only data
+#Filter England only data (ignoring the tiny number of non Lab/Lib/Con MPs from England...)
 Engdata <- subset(data, country=="England")
 
+#Determine Winner
 Engdata$Winner <- case_when(
   Engdata$ConProp>Engdata$LabProp & Engdata$ConProp>Engdata$LibProp ~ "Con",
   Engdata$LabProp>Engdata$LibProp~ "Lab",
@@ -137,7 +141,7 @@ Fulldata <- merge(Engdata1017, Engdata8305, by="cons", all.x=TRUE)
 #Generate 2010 flag
 Fulldata$Flip2010 <- ifelse(Fulldata$Winner2010!=Fulldata$Winner2005, 1, 0)
 
-#generate background
+#generate background polygons for plot
 con <- data.frame(y=c(0,0.5,1/3, 0),
                   x=c(0,0,1/3,0.5),
                   z=c(1,0.5,1/3,0.5), Col="Blue")
