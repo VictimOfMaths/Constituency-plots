@@ -18,7 +18,7 @@ data$LibProp <- data$LibDem/(data$Con+data$Lab+data$LibDem)
 
 data$year <- as.numeric(data$year)
 
-#Align constituency names (doesn't fully solve it as some names reorded in data in some years)
+#Align constituency names (doesn't fully solve it as some names reordered in data in some years)
 data$cons <- gsub("&", "AND", data$cons)
 data$cons <- gsub(",", "", data$cons)
 
@@ -131,7 +131,7 @@ Engdata8305$Flip1992 <- ifelse(Engdata8305$Winner1992!=Engdata8305$Winner1987, 1
 Engdata8305$Flip1987 <- ifelse(Engdata8305$Winner1987!=Engdata8305$Winner1983, 1, 0)
 
 #Stick both together. This loses a few constituencies due to a combination of boundary changes
-#and inconsistent namems
+#and inconsistent names
 Fulldata <- merge(Engdata1017, Engdata8305, by="cons", all.x=TRUE)
 
 #Generate 2010 flag
