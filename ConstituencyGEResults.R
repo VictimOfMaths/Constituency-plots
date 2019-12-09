@@ -199,9 +199,9 @@ ggtern()+
                                      y=LibProp2010, yend=LibProp2015,
                                      z=ConProp2010, zend=ConProp2015, colour=Winner2015), 
                alpha=0.2)+
-  geom_point(data=subset(Engdata1017, Flip2017==1), aes(z=ConProp2015, y=LibProp2015, 
+  geom_point(data=subset(Engdata1017, Flip2015==1), aes(z=ConProp2015, y=LibProp2015, 
                                                         x=LabProp2015, colour=Winner2015))+
-  geom_segment(data=subset(Engdata1017, Flip2017==1), aes(x=LabProp2010, xend=LabProp2015,
+  geom_segment(data=subset(Engdata1017, Flip2015==1), aes(x=LabProp2010, xend=LabProp2015,
                                                           y=LibProp2010, yend=LibProp2015,
                                                           z=ConProp2010, zend=ConProp2015, 
                                                           colour=Winner2015))+
