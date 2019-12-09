@@ -6,6 +6,8 @@ library(dplyr)
 library(ggridges)
 library(forcats)
 
+#Data originates from here https://data.parliament.uk/resources/constituencystatistics/population-by-age.xlsx
+#But with a little bit of tinkering pre-R (one day I will learn how to do this in R)
 data <- fread("Data/population-by-age-const.csv")
 
 sumdata <- data %>%
