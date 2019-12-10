@@ -73,75 +73,89 @@ Engdata1017$Winner2010 <- case_when(
 Engdata1017$Flip2017 <- ifelse(Engdata1017$Winner2017!=Engdata1017$Winner2015, 1, 0)
 Engdata1017$Flip2015 <- ifelse(Engdata1017$Winner2015!=Engdata1017$Winner2010, 1, 0)
 
-#Move onto older data 1983-2005
-Engdata8305 <- spread(subset(Engdata, year<2010)[,c("id", "year", "ConProp")], year, ConProp)
-colnames(Engdata8305) <- c("id", "ConProp1983", "ConProp1987", "ConProp1992", "ConProp1997",
-                           "ConProp2001", "ConProp2005")
+#Move onto older data 1997-2005
+Engdata9705 <- spread(subset(Engdata, year<2010 & year>1992)[,c("id", "year", "ConProp")], year, ConProp)
+colnames(Engdata9705) <- c("id", "ConProp1997", "ConProp2001", "ConProp2005")
 
-temp <- spread(subset(Engdata, year<2010)[,c("id", "year", "LabProp")], year, LabProp)
-colnames(temp) <- c("id", "LabProp1983", "LabProp1987", "LabProp1992", "LabProp1997",
-                    "LabProp2001", "LabProp2005")
+temp <- spread(subset(Engdata, year<2010 & year>1992)[,c("id", "year", "LabProp")], year, LabProp)
+colnames(temp) <- c("id", "LabProp1997","LabProp2001", "LabProp2005")
 
-temp2 <- spread(subset(Engdata, year<2010)[,c("id", "year", "LibProp")], year, LibProp)
-colnames(temp2) <- c("id", "LibProp1983", "LibProp1987", "LibProp1992", "LibProp1997",
-                     "LibProp2001", "LibProp2005")
+temp2 <- spread(subset(Engdata, year<2010 & year>1992)[,c("id", "year", "LibProp")], year, LibProp)
+colnames(temp2) <- c("id", "LibProp1997", "LibProp2001", "LibProp2005")
 
-Engdata8305 <- merge(Engdata8305, temp)
-Engdata8305 <- merge(Engdata8305, temp2)
+Engdata9705 <- merge(Engdata9705, temp)
+Engdata9705 <- merge(Engdata9705, temp2)
 
-Engdata8305 <- merge(Engdata8305, subset(data, year==2005)[,c("id", "cons")], by="id")
+Engdata9705 <- merge(Engdata9705, subset(data, year==2005)[,c("id", "cons")], by="id")
 
-Engdata8305$Winner2005 <- case_when(
-  Engdata8305$ConProp2005>Engdata8305$LabProp2005 & Engdata8305$ConProp2005>Engdata8305$LibProp2005 ~ "Con",
-  Engdata8305$LabProp2005>Engdata8305$LibProp2005 ~ "Lab",
+Engdata9705$Winner2005 <- case_when(
+  Engdata9705$ConProp2005>Engdata9705$LabProp2005 & Engdata9705$ConProp2005>Engdata9705$LibProp2005 ~ "Con",
+  Engdata9705$LabProp2005>Engdata9705$LibProp2005 ~ "Lab",
   TRUE ~ "Lib"
 )
 
-Engdata8305$Winner2001 <- case_when(
-  Engdata8305$ConProp2001>Engdata8305$LabProp2001 & Engdata8305$ConProp2001>Engdata8305$LibProp2001 ~ "Con",
-  Engdata8305$LabProp2001>Engdata8305$LibProp2001 ~ "Lab",
+Engdata9705$Winner2001 <- case_when(
+  Engdata9705$ConProp2001>Engdata9705$LabProp2001 & Engdata9705$ConProp2001>Engdata9705$LibProp2001 ~ "Con",
+  Engdata9705$LabProp2001>Engdata9705$LibProp2001 ~ "Lab",
   TRUE ~ "Lib"
 )
 
-Engdata8305$Winner1997 <- case_when(
-  Engdata8305$ConProp1997>Engdata8305$LabProp1997 & Engdata8305$ConProp1997>Engdata8305$LibProp1997 ~ "Con",
-  Engdata8305$LabProp1997>Engdata8305$LibProp1997 ~ "Lab",
-  TRUE ~ "Lib"
-)
-
-Engdata8305$Winner1992 <- case_when(
-  Engdata8305$ConProp1992>Engdata8305$LabProp1992 & Engdata8305$ConProp1992>Engdata8305$LibProp1992 ~ "Con",
-  Engdata8305$LabProp1992>Engdata8305$LibProp1992 ~ "Lab",
-  TRUE ~ "Lib"
-)
-
-Engdata8305$Winner1987 <- case_when(
-  Engdata8305$ConProp1987>Engdata8305$LabProp1987 & Engdata8305$ConProp1987>Engdata8305$LibProp1987 ~ "Con",
-  Engdata8305$LabProp1987>Engdata8305$LibProp1987 ~ "Lab",
-  TRUE ~ "Lib"
-)
-
-Engdata8305$Winner1983 <- case_when(
-  Engdata8305$ConProp1983>Engdata8305$LabProp1983 & Engdata8305$ConProp1983>Engdata8305$LibProp1983 ~ "Con",
-  Engdata8305$LabProp1983>Engdata8305$LibProp1983 ~ "Lab",
+Engdata9705$Winner1997 <- case_when(
+  Engdata9705$ConProp1997>Engdata9705$LabProp1997 & Engdata9705$ConProp1997>Engdata9705$LibProp1997 ~ "Con",
+  Engdata9705$LabProp1997>Engdata9705$LibProp1997 ~ "Lab",
   TRUE ~ "Lib"
 )
 
 #Generate flags for flipped consituencies
-Engdata8305$Flip2005 <- ifelse(Engdata8305$Winner2005!=Engdata8305$Winner2001, 1, 0)
-Engdata8305$Flip2001 <- ifelse(Engdata8305$Winner2001!=Engdata8305$Winner1997, 1, 0)
-Engdata8305$Flip1997 <- ifelse(Engdata8305$Winner1997!=Engdata8305$Winner1992, 1, 0)
-Engdata8305$Flip1992 <- ifelse(Engdata8305$Winner1992!=Engdata8305$Winner1987, 1, 0)
-Engdata8305$Flip1987 <- ifelse(Engdata8305$Winner1987!=Engdata8305$Winner1983, 1, 0)
+Engdata9705$Flip2005 <- ifelse(Engdata9705$Winner2005!=Engdata9705$Winner2001, 1, 0)
+Engdata9705$Flip2001 <- ifelse(Engdata9705$Winner2001!=Engdata9705$Winner1997, 1, 0)
+Engdata9705$Flip1997 <- ifelse(Engdata9705$Winner1997!=Engdata9705$Winner1992, 1, 0)
 
-#Stick both together. This loses a few constituencies due to a combination of boundary changes
-#and inconsistent names
-Fulldata <- merge(Engdata1017, Engdata8305, by="cons", all.x=TRUE)
+#Oldest data 1983-1992
+Engdata8392 <- spread(subset(Engdata, year<1997)[,c("id", "year", "ConProp")], year, ConProp)
+colnames(Engdata8392) <- c("id", "ConProp1983", "ConProp1987", "ConProp1992")
 
-#Generate 2010 flag
+temp <- spread(subset(Engdata, year<1997)[,c("id", "year", "LabProp")], year, LabProp)
+colnames(temp) <- c("id", "LabProp1983","LabProp1987", "LabProp1992")
+
+temp2 <- spread(subset(Engdata, year<1997)[,c("id", "year", "LibProp")], year, LibProp)
+colnames(temp2) <- c("id", "LibProp1983", "LibProp1987", "LibProp1992")
+
+Engdata8392 <- merge(Engdata8392, temp)
+Engdata8392 <- merge(Engdata8392, temp2)
+
+Engdata8392 <- merge(Engdata8392, subset(data, year==1992)[,c("id", "cons")], by="id")
+Engdata8392$Winner1992 <- case_when(
+  Engdata8392$ConProp1992>Engdata8392$LabProp1992 & Engdata8392$ConProp1992>Engdata8392$LibProp1992 ~ "Con",
+  Engdata8392$LabProp1992>Engdata8392$LibProp1992 ~ "Lab",
+  TRUE ~ "Lib"
+)
+
+Engdata8392$Winner1987 <- case_when(
+  Engdata8392$ConProp1987>Engdata8392$LabProp1987 & Engdata8392$ConProp1987>Engdata8392$LibProp1987 ~ "Con",
+  Engdata8392$LabProp1987>Engdata8392$LibProp1987 ~ "Lab",
+  TRUE ~ "Lib"
+)
+
+Engdata8392$Winner1983 <- case_when(
+  Engdata8392$ConProp1983>Engdata8392$LabProp1983 & Engdata8392$ConProp1983>Engdata8392$LibProp1983 ~ "Con",
+  Engdata8392$LabProp1983>Engdata8392$LibProp1983 ~ "Lab",
+  TRUE ~ "Lib"
+)
+
+
+Engdata8392$Flip1992 <- ifelse(Engdata8392$Winner1992!=Engdata8392$Winner1987, 1, 0)
+Engdata8392$Flip1987 <- ifelse(Engdata8392$Winner1987!=Engdata8392$Winner1983, 1, 0)
+
+#Bring it all back together (lose a few constituencies through misalignment of names in original data)
+Fulldata <- merge(Engdata1017, Engdata9705, by="cons", all.x=TRUE)
+Fulldata <- merge(Fulldata, Engdata8392, by="cons", all.x=TRUE)
+
+#Generate 1997 & 2010 flags
+Fulldata$Flip1997 <- ifelse(Fulldata$Winner1997!=Fulldata$Winner1992, 1, 0)
 Fulldata$Flip2010 <- ifelse(Fulldata$Winner2010!=Fulldata$Winner2005, 1, 0)
 
-#generate background polygons for plot
+#generate background
 con <- data.frame(y=c(0,0.5,1/3, 0),
                   x=c(0,0,1/3,0.5),
                   z=c(1,0.5,1/3,0.5), Col="Blue")
@@ -173,8 +187,8 @@ ggtern()+
   geom_point(data=subset(Engdata1017, Flip2017==1), aes(z=ConProp2017, y=LibProp2017, 
                                                         x=LabProp2017, colour=Winner2017))+
   geom_segment(data=subset(Engdata1017, Flip2017==1), aes(x=LabProp2015, xend=LabProp2017,
-                                                          y=LibProp2015, yend=LibProp2017,
-                                                          z=ConProp2015, zend=ConProp2017, colour=Winner2017))+
+                                     y=LibProp2015, yend=LibProp2017,
+                                     z=ConProp2015, zend=ConProp2017, colour=Winner2017))+
   scale_colour_manual(values=c("#0087dc", "#d50000", "#fdbb30"), guide=FALSE)+
   labs(x="", xarrow="Labour vote %", y="", yarrow="Lib Dem vote %", 
        z="", zarrow="Conservative vote %", 
@@ -225,15 +239,15 @@ ggtern()+
   geom_point(data=Fulldata, aes(z=ConProp2010, y=LibProp2010, x=LabProp2010, colour=Winner2010), 
              alpha=0.2)+
   geom_segment(data=Fulldata, aes(x=LabProp2005, xend=LabProp2010,
-                                  y=LibProp2005, yend=LibProp2010,
-                                  z=ConProp2005, zend=ConProp2010, colour=Winner2010), 
+                                     y=LibProp2005, yend=LibProp2010,
+                                     z=ConProp2005, zend=ConProp2010, colour=Winner2010), 
                alpha=0.2)+
   geom_point(data=subset(Fulldata, Flip2010==1), aes(z=ConProp2010, y=LibProp2010, 
-                                                     x=LabProp2010, colour=Winner2010))+
+                                                        x=LabProp2010, colour=Winner2010))+
   geom_segment(data=subset(Fulldata, Flip2010==1), aes(x=LabProp2005, xend=LabProp2010,
-                                                       y=LibProp2005, yend=LibProp2010,
-                                                       z=ConProp2005, zend=ConProp2010, 
-                                                       colour=Winner2010))+
+                                                          y=LibProp2005, yend=LibProp2010,
+                                                          z=ConProp2005, zend=ConProp2010, 
+                                                          colour=Winner2010))+
   scale_colour_manual(values=c("#0087dc", "#d50000", "#fdbb30"), guide=FALSE)+
   labs(x="", xarrow="Labour vote %", y="", yarrow="Lib Dem vote %", 
        z="", zarrow="Conservative vote %", 
@@ -251,15 +265,15 @@ ggtern()+
   geom_segment(aes(x=0.5, xend=1/3, y=0.5, yend=1/3, z=0, zend=1/3), colour="white")+
   geom_segment(aes(x=0.5, xend=1/3, y=0, yend=1/3, z=0.5, zend=1/3), colour="white")+
   geom_segment(aes(x=0, xend=1/3, y=0.5, yend=1/3, z=0.5, zend=1/3), colour="white")+
-  geom_point(data=Engdata8305, aes(z=ConProp2005, y=LibProp2005, x=LabProp2005, colour=Winner2005), 
+  geom_point(data=Engdata9705, aes(z=ConProp2005, y=LibProp2005, x=LabProp2005, colour=Winner2005), 
              alpha=0.2)+
-  geom_segment(data=Engdata8305, aes(x=LabProp2001, xend=LabProp2005,
+  geom_segment(data=Engdata9705, aes(x=LabProp2001, xend=LabProp2005,
                                      y=LibProp2001, yend=LibProp2005,
                                      z=ConProp2001, zend=ConProp2005, colour=Winner2005), 
                alpha=0.2)+
-  geom_point(data=subset(Engdata8305, Flip2005==1), aes(z=ConProp2005, y=LibProp2005, 
+  geom_point(data=subset(Engdata9705, Flip2005==1), aes(z=ConProp2005, y=LibProp2005, 
                                                         x=LabProp2005, colour=Winner2005))+
-  geom_segment(data=subset(Engdata8305, Flip2005==1), aes(x=LabProp2001, xend=LabProp2005,
+  geom_segment(data=subset(Engdata9705, Flip2005==1), aes(x=LabProp2001, xend=LabProp2005,
                                                           y=LibProp2001, yend=LibProp2005,
                                                           z=ConProp2001, zend=ConProp2005, 
                                                           colour=Winner2005))+
@@ -280,15 +294,15 @@ ggtern()+
   geom_segment(aes(x=0.5, xend=1/3, y=0.5, yend=1/3, z=0, zend=1/3), colour="white")+
   geom_segment(aes(x=0.5, xend=1/3, y=0, yend=1/3, z=0.5, zend=1/3), colour="white")+
   geom_segment(aes(x=0, xend=1/3, y=0.5, yend=1/3, z=0.5, zend=1/3), colour="white")+
-  geom_point(data=Engdata8305, aes(z=ConProp2001, y=LibProp2001, x=LabProp2001, colour=Winner2001), 
+  geom_point(data=Engdata9705, aes(z=ConProp2001, y=LibProp2001, x=LabProp2001, colour=Winner2001), 
              alpha=0.2)+
-  geom_segment(data=Engdata8305, aes(x=LabProp1997, xend=LabProp2001,
+  geom_segment(data=Engdata9705, aes(x=LabProp1997, xend=LabProp2001,
                                      y=LibProp1997, yend=LibProp2001,
                                      z=ConProp1997, zend=ConProp2001, colour=Winner2001), 
                alpha=0.2)+
-  geom_point(data=subset(Engdata8305, Flip2001==1), aes(z=ConProp2001, y=LibProp2001, 
+  geom_point(data=subset(Engdata9705, Flip2001==1), aes(z=ConProp2001, y=LibProp2001, 
                                                         x=LabProp2001, colour=Winner2001))+
-  geom_segment(data=subset(Engdata8305, Flip2001==1), aes(x=LabProp1997, xend=LabProp2001,
+  geom_segment(data=subset(Engdata9705, Flip2001==1), aes(x=LabProp1997, xend=LabProp2001,
                                                           y=LibProp1997, yend=LibProp2001,
                                                           z=ConProp1997, zend=ConProp2001, 
                                                           colour=Winner2001))+
@@ -309,15 +323,15 @@ ggtern()+
   geom_segment(aes(x=0.5, xend=1/3, y=0.5, yend=1/3, z=0, zend=1/3), colour="white")+
   geom_segment(aes(x=0.5, xend=1/3, y=0, yend=1/3, z=0.5, zend=1/3), colour="white")+
   geom_segment(aes(x=0, xend=1/3, y=0.5, yend=1/3, z=0.5, zend=1/3), colour="white")+
-  geom_point(data=Engdata8305, aes(z=ConProp1997, y=LibProp1997, x=LabProp1997, colour=Winner1997), 
+  geom_point(data=Fulldata, aes(z=ConProp1997, y=LibProp1997, x=LabProp1997, colour=Winner1997), 
              alpha=0.2)+
-  geom_segment(data=Engdata8305, aes(x=LabProp1992, xend=LabProp1997,
+  geom_segment(data=Fulldata, aes(x=LabProp1992, xend=LabProp1997,
                                      y=LibProp1992, yend=LibProp1997,
                                      z=ConProp1992, zend=ConProp1997, colour=Winner1997), 
                alpha=0.2)+
-  geom_point(data=subset(Engdata8305, Flip1997==1), aes(z=ConProp1997, y=LibProp1997, 
+  geom_point(data=subset(Fulldata, Flip1997==1), aes(z=ConProp1997, y=LibProp1997, 
                                                         x=LabProp1997, colour=Winner1997))+
-  geom_segment(data=subset(Engdata8305, Flip1997==1), aes(x=LabProp1992, xend=LabProp1997,
+  geom_segment(data=subset(Fulldata, Flip1997==1), aes(x=LabProp1992, xend=LabProp1997,
                                                           y=LibProp1992, yend=LibProp1997,
                                                           z=ConProp1992, zend=ConProp1997, 
                                                           colour=Winner1997))+
@@ -338,15 +352,15 @@ ggtern()+
   geom_segment(aes(x=0.5, xend=1/3, y=0.5, yend=1/3, z=0, zend=1/3), colour="white")+
   geom_segment(aes(x=0.5, xend=1/3, y=0, yend=1/3, z=0.5, zend=1/3), colour="white")+
   geom_segment(aes(x=0, xend=1/3, y=0.5, yend=1/3, z=0.5, zend=1/3), colour="white")+
-  geom_point(data=Engdata8305, aes(z=ConProp1992, y=LibProp1992, x=LabProp1992, colour=Winner1992), 
+  geom_point(data=Engdata8392, aes(z=ConProp1992, y=LibProp1992, x=LabProp1992, colour=Winner1992), 
              alpha=0.2)+
-  geom_segment(data=Engdata8305, aes(x=LabProp1987, xend=LabProp1992,
+  geom_segment(data=Engdata8392, aes(x=LabProp1987, xend=LabProp1992,
                                      y=LibProp1987, yend=LibProp1992,
                                      z=ConProp1987, zend=ConProp1992, colour=Winner1992), 
                alpha=0.2)+
-  geom_point(data=subset(Engdata8305, Flip1992==1), aes(z=ConProp1992, y=LibProp1992, 
+  geom_point(data=subset(Engdata8392, Flip1992==1), aes(z=ConProp1992, y=LibProp1992, 
                                                         x=LabProp1992, colour=Winner1992))+
-  geom_segment(data=subset(Engdata8305, Flip1992==1), aes(x=LabProp1987, xend=LabProp1992,
+  geom_segment(data=subset(Engdata8392, Flip1992==1), aes(x=LabProp1987, xend=LabProp1992,
                                                           y=LibProp1987, yend=LibProp1992,
                                                           z=ConProp1987, zend=ConProp1992, 
                                                           colour=Winner1992))+
@@ -367,15 +381,15 @@ ggtern()+
   geom_segment(aes(x=0.5, xend=1/3, y=0.5, yend=1/3, z=0, zend=1/3), colour="white")+
   geom_segment(aes(x=0.5, xend=1/3, y=0, yend=1/3, z=0.5, zend=1/3), colour="white")+
   geom_segment(aes(x=0, xend=1/3, y=0.5, yend=1/3, z=0.5, zend=1/3), colour="white")+
-  geom_point(data=Engdata8305, aes(z=ConProp1987, y=LibProp1987, x=LabProp1987, colour=Winner1987), 
+  geom_point(data=Engdata8392, aes(z=ConProp1987, y=LibProp1987, x=LabProp1987, colour=Winner1987), 
              alpha=0.2)+
-  geom_segment(data=Engdata8305, aes(x=LabProp1983, xend=LabProp1987,
+  geom_segment(data=Engdata8392, aes(x=LabProp1983, xend=LabProp1987,
                                      y=LibProp1983, yend=LibProp1987,
                                      z=ConProp1983, zend=ConProp1987, colour=Winner1987), 
                alpha=0.2)+
-  geom_point(data=subset(Engdata8305, Flip1987==1), aes(z=ConProp1987, y=LibProp1987, 
+  geom_point(data=subset(Engdata8392, Flip1987==1), aes(z=ConProp1987, y=LibProp1987, 
                                                         x=LabProp1987, colour=Winner1987))+
-  geom_segment(data=subset(Engdata8305, Flip1987==1), aes(x=LabProp1983, xend=LabProp1987,
+  geom_segment(data=subset(Engdata8392, Flip1987==1), aes(x=LabProp1983, xend=LabProp1987,
                                                           y=LibProp1983, yend=LibProp1987,
                                                           z=ConProp1983, zend=ConProp1987, 
                                                           colour=Winner1987))+
