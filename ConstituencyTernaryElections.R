@@ -6,6 +6,8 @@ library(snakecase)
 library(ggtern)
 library(extrafont)
 library(ragg)
+library(tricolore)
+library(sf)
 library(cowplot)
 
 #Read in historic election data from House of Commons library
@@ -62,9 +64,10 @@ lab <- data.frame(z=c(0,0.5,1/3, 0),
 background <- rbind(con, lib, lab)
 
 const <- "Batley And Spen"
+
+plotdata <- data %>% filter(constituency==const & election>=1974)
 plottitle <- paste("Electoral shifts in", const, "since", min(plotdata$election))
 
-plotdata <- data %>% filter(constituency==const)
 
 agg_tiff("Outputs/UKElectionsBatleySpen.tiff", units="in", width=6, height=6, res=800)
 ggtern()+
@@ -85,4 +88,76 @@ ggtern()+
   theme(text=element_text(family="Lato"), plot.title=element_text(face="bold", size=rel(1.5)))
 dev.off()
 
+###########################
+#Map of the latest results
 
+latest <- data %>% 
+  filter(election>=2019) %>% 
+  group_by(constituency) %>% 
+  filter(election==max(election)) %>% 
+  ungroup()
+
+#Set up ternary colour scheme
+tricolore2019 <- Tricolore(latest, "Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+#Tidy up the key
+key <- tricolore2019$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+latest$rgb <- tricolore2019$rgb
+
+#Download Carl Baker's lovely map
+parl <- tempfile()
+source <- ("https://github.com/houseofcommonslibrary/uk-hex-cartograms-noncontiguous/raw/main/geopackages/Constituencies.gpkg")
+parl <- curl_download(url=source, destfile=parl, quiet=FALSE, mode="wb")
+
+Background <- st_read(parl, layer="5 Background") %>% 
+  filter(Name=="England & Wales")
+
+votes <- st_read(parl, layer="4 Constituencies") %>%
+  mutate(constituency=to_upper_camel_case(pcon.name, sep_out=" ")) %>% 
+  filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) %>% 
+  left_join(latest, by="constituency", all=TRUE)
+
+Cities <- st_read(parl, layer="3 City outlines") %>% 
+  filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) 
+
+Groups <- st_read(parl, layer="2 Group outlines") %>% 
+  filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) 
+
+Group_labels <- st_read(parl, layer="1 Group names") %>% 
+  mutate(just=if_else(LabelPosit=="Left", 0, 1)) %>%
+  filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) 
+
+
+plot1 <- ggplot()+
+  geom_sf(data=Background, aes(geometry=geom), fill="White")+
+  geom_sf(data=votes, aes(geometry=geom, fill=rgb), colour="White", size=0.1)+
+  geom_sf(data=Groups, aes(geometry=geom), fill=NA, colour="Black")+
+  geom_sf(data=Cities, aes(geometry=geom), fill=NA, colour="Black")+
+  geom_sf_text(data=Group_labels, aes(geometry=geom, label=Group.labe,
+                                      hjust=just), size=rel(2.4), colour="Black")+
+  scale_fill_identity()+
+  coord_sf(clip="off")+
+  theme_void()+
+  theme(plot.title=element_text(face="bold", size=rel(2)),
+        text=element_text(family="Lato"))+
+  labs(title="Vote share in England by constituency")+
+  annotation_custom(
+    ggplotGrob(key),
+    xmin = 43, xmax = 63, ymin = 43, ymax = 60)+
+  annotate("text", x=58, y=2, family="Lato", size=rel(3), hjust=1,
+           label="Data and cartogram from the House of Commons Library\nPlot by @VictimOfMaths")+
+  annotate("text", x=17, y=50, family="Lato", size=rel(3), hjust=0.5,
+           label="By convention, the speaker, Lindsay Hoyle's\n Chorley constituency was not contested\nin the 2019 General Election")+
+  geom_curve(aes(x=19, y=48, xend=27, yend=39), curvature=0.2)+
+  annotate("text", x=11, y=58, family="Lato", size=rel(4), hjust=0,
+           label="Every parliamentary constituency in England, coloured by their vote share\nbetween the three major parties in the most recent General or By-Election.")
+
+agg_tiff("Outputs/UKElectionsTernaryCartogram.tiff", units="in", width=9, height=10, res=800)
+plot1
+dev.off()
