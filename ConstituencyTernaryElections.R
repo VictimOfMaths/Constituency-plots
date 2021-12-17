@@ -1,6 +1,12 @@
 rm(list=ls())
 
-library(tidyverse)
+#ggtern only works with older version of ggplot
+#require(devtools)
+#install_version("ggplot2", version = "3.3.2", repos = "http://cran.us.r-project.org")
+#install_version("ggtern", version = "3.3.0", repos = "http://cran.us.r-project.org")
+
+library(dplyr)
+library(ggplot2)
 library(curl)
 library(snakecase)
 library(ggtern)
@@ -24,11 +30,12 @@ data <- read.csv(temp) %>%
          lib_votes=if_else(is.na(lib_votes), 0, as.double(lib_votes)),
          con_votes=if_else(is.na(con_votes), 0, as.double(con_votes))) %>% 
   #Add in post-2019 by-election results manually
-  bind_rows(data.frame(constituency=c("Hartlepool", "Chesham And Amersham", "Batley And Spen"),
-            lab_votes=c(8589, 622, 13296),
-            lib_votes=c(349, 21517, 1254),
-            con_votes=c(15529, 13489, 12973),
-            election=c("2021", "2021", "2021"))) %>% 
+  bind_rows(data.frame(constituency=c("Hartlepool", "Chesham And Amersham", 
+                                      "Batley And Spen", "North Shropshire"),
+            lab_votes=c(8589, 622, 13296, 3686),
+            lib_votes=c(349, 21517, 1254, 17957),
+            con_votes=c(15529, 13489, 12973, 12032),
+            election=c("2021", "2021", "2021", "2021"))) %>% 
   rowwise() %>% 
   #Calculate % of votes going to main parties which went to each one
   mutate(Lab_prop=lab_votes/(lab_votes+con_votes+lib_votes),
@@ -63,13 +70,13 @@ lab <- data.frame(z=c(0,0.5,1/3, 0),
 
 background <- rbind(con, lib, lab)
 
-const <- "Batley And Spen"
+const <- "North Shropshire"
 
 plotdata <- data %>% filter(constituency==const & election>=1974)
-plottitle <- paste("Electoral shifts in", const, "since", min(plotdata$election))
+#plottitle <- paste("Electoral shifts in", const, "since", min(plotdata$election))
 
 
-agg_tiff("Outputs/UKElectionsBatleySpen.tiff", units="in", width=6, height=6, res=800)
+agg_tiff("Outputs/UKElectionsNorthShropshire.tiff", units="in", width=6, height=6, res=800)
 ggtern()+
   geom_polygon(data=background, aes(x, y, z,fill=Col), alpha=0.2)+
   theme_hidegrid()+
@@ -84,8 +91,11 @@ ggtern()+
              show.legend=FALSE)+
   scale_colour_manual(values=c(Conservative="#0087dc", Labour="#d50000", `Lib Dems`="#fdbb30"), guide=FALSE)+
   labs(x="", xarrow="Labour vote %", y="", yarrow="Lib Dem vote %", 
-       z="", zarrow="Conservative vote %", title=plottitle)+
+       z="", zarrow="Conservative vote %", 
+       title="The North Shropshire by-election result was *wild*",
+       subtitle="Vote share of the 3 main parties in UK general elections from 1997 onwards\nand in yesterday's by-election in North Shropshire")+
   theme(text=element_text(family="Lato"), plot.title=element_text(face="bold", size=rel(1.5)))
+
 dev.off()
 
 ###########################
@@ -161,3 +171,7 @@ plot1 <- ggplot()+
 agg_tiff("Outputs/UKElectionsTernaryCartogram.tiff", units="in", width=9, height=10, res=800)
 plot1
 dev.off()
+
+
+
+
