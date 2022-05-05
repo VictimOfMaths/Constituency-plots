@@ -421,24 +421,47 @@ test <- warddata_full %>%
   filter(is.na(partyName))
 
 waffledata <- warddata_full %>% 
-  filter(!is.na(decile)) %>% 
+  filter(!is.na(decile) & !is.na(partyName) & !WD21CD %in% c("E05009289", "E05009290", "E05009291", "E05009292", "E05009293", "E05009294", "E05009295", "E05009296",
+                                                            "E05009297", "E05009298", "E05009299", "E05009300", "E05009301", "E05009303", "E05009305", "E05009306",
+                                                            "E05009307", "E05009309", "E05009310", "E05009312")) %>% 
+  mutate(decile=quantcut(IMDrank, q=10, labels=FALSE)) %>% 
   group_by(decile) %>% 
   arrange(IMDrank) %>% 
   mutate(position=c(1:n())) %>% 
   ungroup()
 
-ggplot(waffledata, aes(x=as.factor(decile), y=position, fill=PartyShort))+
+agg_png("Outputs/CouncilWardsxIMD.png", units="in", width=12, height=6, res=800)
+ggplot(waffledata, aes(y=as.factor(decile), x=position, fill=PartyShort))+
   geom_tile()+
+  scale_x_continuous(name="")+
+  scale_y_discrete(name="Index of Multiple Deprivation", labels=c("Most deprived\ndecile", "","","","",
+                                                                  "","","","","Least deprived\ndecile"))+
   scale_fill_manual(values=c("#0087DC", "#6AB023", "#E4003B", "#FAA61A", "Grey30"), 
                     na.value="White", name="")+
-  #facet_wrap(~as.factor(decile))+
-  theme_custom()
+  theme_custom()+
+  theme(axis.line=element_blank(), axis.ticks=element_blank(), axis.text.x=element_blank(),
+        legend.position="top", plot.title=element_text(face="bold", size=rel(2.5), hjust=0,
+                                                        margin=margin(0,0,5.5,0)),)+
+  labs(title="The politics of inequality",
+       subtitle="Party affiliation for current English local councillors, arranged by decile of the Index of Multiple Deprivation.\nWithin each decile, wards are sorted with the most deprived wards on the left and the least deprived on the right.",
+       caption="Data from opencouncildata.co.uk, ONS and MHCLG\nPlot by @VictimOfMaths\nInspired by @undertheraedar")
+dev.off()
 
+agg_png("Outputs/CouncilWardsxIMDRidges.png", units="in", width=9, height=6, res=800)
 ggplot(waffledata, aes(x=IMDrank, y=PartyShort, fill=PartyShort))+
   geom_density_ridges()+
+  scale_x_continuous(name="Index of Multiple Deprivation", breaks=c(0,32500), 
+                     labels=c("Most\ndeprived", "Least\ndeprived"))+
+  scale_y_discrete(name="")+
   scale_fill_manual(values=c("#0087DC", "#6AB023", "#E4003B", "#FAA61A", "Grey30"), 
                     na.value="White", name="")+
-  theme_custom()
+  theme_custom()+
+  theme(plot.title=element_text(face="bold", size=rel(2.5), hjust=0,
+                                 margin=margin(0,0,5.5,0)))+
+  labs(title="The politics of inequality",
+       subtitle="The distribution of deprivation (as measured by the Index of Multiple Deprivation) for English local council wards\nby political affiliation of current councillors",
+       caption="Data from opencouncildata.co.uk, ONS and MHCLG\nPlot by @VictimOfMaths")
+dev.off()
 
 mapdata3 <- shapefile20 %>% 
   left_join(warddata_full, by="WD20CD", all=T) %>% 
