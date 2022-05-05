@@ -448,14 +448,14 @@ mapdata4 <- shapefile21 %>%
   left_join(warddata_full, by="WD21CD", all=T) %>% 
   filter(!is.na(PartyShort))
 
-agg_tiff("Outputs/CouncilWardsxParty.tiff", units="in", width=9, height=8, res=1400)
+agg_png("Outputs/CouncilWardsxParty.png", units="in", width=9, height=8, res=800)
 ggplot()+
   geom_sf(data=mapdata4, aes(geometry=geometry, fill=PartyShort), colour=NA)+
   geom_sf(data=mapdata3, aes(geometry=geometry, fill=PartyShort), colour=NA)+
   scale_fill_manual(values=c("#0087DC", "#6AB023", "#E4003B", "#FAA61A", "Grey30"), 
                     na.value="transparent", name="")+
   theme_void()+
-  theme(plot.title=element_text(face="bold", size=rel(1.5), hjust=0,
+  theme(plot.title=element_text(face="bold", size=rel(2.5), hjust=0,
                                 margin=margin(0,0,5.5,0)),
         text=element_text(family="Lato"),
         plot.subtitle=element_text(colour="Grey40", hjust=0, vjust=1),
@@ -465,6 +465,22 @@ ggplot()+
        caption="Data from opencouncildata.co.uk & ONS")
 dev.off()
 
+agg_png("Outputs/CouncilWardsxPartyMay22.png", units="in", width=9, height=8, res=800)
+ggplot()+
+  geom_sf(data=mapdata4 %>% filter(next.election.date==as.Date("2022-05-05")), aes(geometry=geometry, fill=PartyShort), colour=NA)+
+  geom_sf(data=mapdata3 %>% filter(next.election.date==as.Date("2022-05-05")), aes(geometry=geometry, fill=PartyShort), colour=NA)+
+  scale_fill_manual(values=c("#0087DC", "#6AB023", "#E4003B", "#FAA61A", "Grey30"), 
+                    na.value="transparent", name="")+
+  theme_void()+
+  theme(plot.title=element_text(face="bold", size=rel(2.5), hjust=0,
+                                margin=margin(0,0,5.5,0)),
+        text=element_text(family="Lato"),
+        plot.subtitle=element_text(colour="Grey40", hjust=0, vjust=1),
+        plot.caption=element_text(colour="Grey40", hjust=1, vjust=1, size=rel(0.8)),)+
+  labs(title="On the line",
+       subtitle="Party affiliation of English councillors whose seats are up for reelection today",
+       caption="Data from opencouncildata.co.uk & ONS")
+dev.off()
 
 
 #Download council composition data for 2021 from opencouncildata.co.uk
