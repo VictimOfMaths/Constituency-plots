@@ -1,9 +1,9 @@
 rm(list=ls())
 
 #ggtern only works with older version of ggplot
-#require(devtools)
-#install_version("ggplot2", version = "3.3.2", repos = "http://cran.us.r-project.org")
-#install_version("ggtern", version = "3.3.0", repos = "http://cran.us.r-project.org")
+require(devtools)
+install_version("ggplot2", version = "3.3.2", repos = "http://cran.us.r-project.org")
+install_version("ggtern", version = "3.3.0", repos = "http://cran.us.r-project.org")
 
 library(dplyr)
 library(ggplot2)
@@ -31,11 +31,12 @@ data <- read.csv(temp) %>%
          con_votes=if_else(is.na(con_votes), 0, as.double(con_votes))) %>% 
   #Add in post-2019 by-election results manually
   bind_rows(data.frame(constituency=c("Hartlepool", "Chesham And Amersham", 
-                                      "Batley And Spen", "North Shropshire"),
-            lab_votes=c(8589, 622, 13296, 3686),
-            lib_votes=c(349, 21517, 1254, 17957),
-            con_votes=c(15529, 13489, 12973, 12032),
-            election=c("2021", "2021", "2021", "2021"))) %>% 
+                                      "Batley And Spen", "North Shropshire",
+                                      "Tiverton And Honiton", "Wakefield"),
+            lab_votes=c(8589, 622, 13296, 3686, 1562, 13166),
+            lib_votes=c(349, 21517, 1254, 17957, 22537, 508),
+            con_votes=c(15529, 13489, 12973, 12032, 16393, 8241),
+            election=c("2021", "2021", "2021", "2021", "2022", "2022"))) %>% 
   rowwise() %>% 
   #Calculate % of votes going to main parties which went to each one
   mutate(Lab_prop=lab_votes/(lab_votes+con_votes+lib_votes),
@@ -70,13 +71,13 @@ lab <- data.frame(z=c(0,0.5,1/3, 0),
 
 background <- rbind(con, lib, lab)
 
-const <- "North Shropshire"
+const <- "Wakefield"
 
 plotdata <- data %>% filter(constituency==const & election>=1974)
-#plottitle <- paste("Electoral shifts in", const, "since", min(plotdata$election))
+plottitle <- paste("Electoral shifts in", const, "since", min(plotdata$election))
 
 
-agg_tiff("Outputs/UKElectionsNorthShropshire.tiff", units="in", width=6, height=6, res=800)
+agg_tiff("Outputs/UKElectionsWakefield.tiff", units="in", width=6, height=6, res=800)
 ggtern()+
   geom_polygon(data=background, aes(x, y, z,fill=Col), alpha=0.2)+
   theme_hidegrid()+
@@ -92,9 +93,10 @@ ggtern()+
   scale_colour_manual(values=c(Conservative="#0087dc", Labour="#d50000", `Lib Dems`="#fdbb30"), guide=FALSE)+
   labs(x="", xarrow="Labour vote %", y="", yarrow="Lib Dem vote %", 
        z="", zarrow="Conservative vote %", 
-       title="The North Shropshire by-election result was *wild*",
-       subtitle="Vote share of the 3 main parties in UK general elections from 1997 onwards\nand in yesterday's by-election in North Shropshire")+
-  theme(text=element_text(family="Lato"), plot.title=element_text(face="bold", size=rel(1.5)))
+       title=plottitle,
+       subtitle="Vote share of the 3 main parties in UK general elections and the 2022 by-election")+
+  theme(text=element_text(family="Lato"), plot.title=element_text(face="bold", size=rel(1.5)),
+        plot.subtitle=element_text(colour="Grey40"))
 
 dev.off()
 
@@ -161,16 +163,47 @@ plot1 <- ggplot()+
     ggplotGrob(key),
     xmin = 43, xmax = 63, ymin = 43, ymax = 60)+
   annotate("text", x=58, y=2, family="Lato", size=rel(3), hjust=1,
-           label="Data and cartogram from the House of Commons Library\nPlot by @VictimOfMaths")+
+           label="\nData and cartogram from the House of Commons Library\nPlot by @VictimOfMaths")+
   annotate("text", x=17, y=50, family="Lato", size=rel(3), hjust=0.5,
            label="By convention, the speaker, Lindsay Hoyle's\n Chorley constituency was not contested\nin the 2019 General Election")+
   geom_curve(aes(x=19, y=48, xend=27, yend=39), curvature=0.2)+
-  annotate("text", x=11, y=58, family="Lato", size=rel(4), hjust=0,
+  annotate("text", x=11, y=59, family="Lato", size=rel(4), hjust=0, colour="Grey40",
            label="Every parliamentary constituency in England, coloured by their vote share\nbetween the three major parties in the most recent General or By-Election.")
 
-agg_tiff("Outputs/UKElectionsTernaryCartogram.tiff", units="in", width=9, height=10, res=800)
+agg_png("Outputs/UKElectionsTernaryCartogram.png", units="in", width=9, height=10, res=800)
 plot1
 dev.off()
+
+plot2 <- ggplot()+
+  geom_sf(data=Background, aes(geometry=geom), fill="White")+
+  geom_sf(data=votes, aes(geometry=geom, fill=rgb), colour="White", size=0.1)+
+  geom_sf(data=Groups, aes(geometry=geom), fill=NA, colour="Black")+
+  geom_sf(data=Cities, aes(geometry=geom), fill=NA, colour="Black")+
+  geom_sf(data=votes %>% filter(election==2022), aes(geometry=geom), fill=NA, colour="Red")+
+  geom_sf_text(data=Group_labels, aes(geometry=geom, label=Group.labe,
+                                      hjust=just), size=rel(2.4), colour="Black")+
+  scale_fill_identity()+
+  coord_sf(clip="off")+
+  theme_void()+
+  theme(plot.title=element_text(face="bold", size=rel(2)),
+        text=element_text(family="Lato"))+
+  labs(title="Vote share in England by constituency")+
+  annotation_custom(
+    ggplotGrob(key),
+    xmin = 43, xmax = 63, ymin = 43, ymax = 60)+
+  annotate("text", x=58, y=2, family="Lato", size=rel(3), hjust=1,
+           label="\nData and cartogram from the House of Commons Library\nPlot by @VictimOfMaths")+
+  annotate("text", x=17, y=50, family="Lato", size=rel(3), hjust=0.5,
+           label="By convention, the speaker, Lindsay Hoyle's\n Chorley constituency was not contested\nin the 2019 General Election")+
+  geom_curve(aes(x=19, y=48, xend=27, yend=39), curvature=0.2)+
+  annotate("text", x=11, y=59, family="Lato", size=rel(4), hjust=0, colour="Grey40",
+           label="Every parliamentary constituency in England, coloured by their vote share\nbetween the three major parties in the most recent General or By-Election.")
+
+agg_png("Outputs/UKElectionsTernaryCartogram2022.png", units="in", width=9, height=10, res=800)
+plot2
+dev.off()
+
+
 
 
 
