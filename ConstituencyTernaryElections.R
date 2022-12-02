@@ -207,5 +207,139 @@ agg_png("Outputs/UKElectionsTernaryCartogram2022.png", units="in", width=9, heig
 plot2
 dev.off()
 
+#Ternary keys for major general elections
+key1992 <- data %>% 
+  filter(election==1992) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
 
+key1992plot <- key1992$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key1997 <- data %>% 
+  filter(election==1997) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key1997plot <- key1997$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key2001 <- data %>% 
+  filter(election==2001) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key2001plot <- key2001$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key2005 <- data %>% 
+  filter(election==2005) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key2005plot <- key2005$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key2010 <- data %>% 
+  filter(election==2010) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key2010plot <- key2010$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key2015 <- data %>% 
+  filter(election==2015) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key2015plot <- key2015$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key2017 <- data %>% 
+  filter(election==2017) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key2017plot <- key2017$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+key2019 <- data %>% 
+  filter(election==2019) %>% 
+  group_by(constituency_name) %>% 
+  filter(election==max(election)) %>% 
+  ungroup() %>% 
+  Tricolore("Lib_prop", "Con_prop", "Lab_prop", breaks=100)
+
+key2019plot <- key2019$key+
+  labs(L='Lib Dem', R='Labour', T='Conservative', x="", y="", z="")+
+  scale_T_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_L_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  scale_R_continuous(breaks=c(0.25,0.5,0.75, 1), labels=c("25%", "50%", "75%", "100%"))+
+  theme(text=element_text(family="Lato"))
+
+# now add the title
+title <- ggdraw() + 
+  draw_label(
+    "Shifts in vote shares for English constituencies in General Elections 1992-2019",
+    fontface = 'bold',
+    x = 0,
+    hjust = 0
+  ) +
+  theme(
+    # add margin on the left of the drawing canvas,
+    # so title is aligned with left edge of first plot
+    plot.margin = margin(0, 0, 0, 7))
+
+agg_png("Outputs/UKElectionsTernaryKeys.png", units="in", width=12, height=7, res=800)
+plot_grid(title,
+          plot_grid(ggplotGrob(key1992plot), ggplotGrob(key1997plot), ggplotGrob(key2001plot),
+          ggplotGrob(key2005plot), ggplotGrob(key2010plot), ggplotGrob(key2015plot),
+          ggplotGrob(key2017plot), ggplotGrob(key2019plot), 
+          labels=c("1992", "1997", "2001", "2005", "2010", "2015", "2017", "2019"),
+          nrow=2), ncol=1, rel_heights=c(0.1,1))
+
+dev.off()
 
