@@ -21,7 +21,8 @@ temp <- tempfile()
 source <- "https://researchbriefings.files.parliament.uk/documents/CBP-8647/1918-2019election_results.csv"
 temp <- curl_download(url=source, destfile=temp, quiet=FALSE, mode="wb")
 
-data <- read.csv(temp) %>% 
+#data <- read.csv(temp) %>% 
+data <- read.csv("C:/Users/cm1cra/Downloads/1918-2019election_results.csv") %>% 
   #Keep only English data as other parties are too large a factor elsewhere
   filter(!country.region %in% c("Scotland", "Wales", "Northern Ireland")) %>% 
   #Tidy up the constituency names
@@ -106,7 +107,7 @@ dev.off()
 
 latest <- data %>% 
   filter(election>=2019) %>% 
-  group_by(constituency) %>% 
+  group_by(constituency_name) %>% 
   filter(election==max(election)) %>% 
   ungroup()
 
@@ -132,9 +133,11 @@ Background <- st_read(parl, layer="5 Background") %>%
   filter(Name=="England & Wales")
 
 votes <- st_read(parl, layer="4 Constituencies") %>%
-  mutate(constituency=to_upper_camel_case(pcon.name, sep_out=" ")) %>% 
+  mutate(constituency_name=to_upper_camel_case(pcon.name, sep_out=" "),
+         constituency_name=if_else(constituency_name=="Richmond Yorks",
+                 "Richmond Yorkshire", constituency_name)) %>% 
   filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) %>% 
-  left_join(latest, by="constituency", all=TRUE)
+  left_join(latest, by="constituency_name", all=TRUE)
 
 Cities <- st_read(parl, layer="3 City outlines") %>% 
   filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) 
