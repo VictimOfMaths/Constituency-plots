@@ -21,6 +21,10 @@ temp <- tempfile()
 source <- "https://researchbriefings.files.parliament.uk/documents/CBP-8647/1918-2019election_results.csv"
 temp <- curl_download(url=source, destfile=temp, quiet=FALSE, mode="wb")
 
+#At the moment this download link doesn't seem to work through curl, it works fine if
+#you enter it into a browser, so just download it and amend the filepath below to
+#wherever you've put it on your computer.
+
 #data <- read.csv(temp) %>% 
 data <- read.csv("C:/Users/cm1cra/Downloads/1918-2019election_results.csv") %>% 
   #Keep only English data as other parties are too large a factor elsewhere
@@ -34,11 +38,13 @@ data <- read.csv("C:/Users/cm1cra/Downloads/1918-2019election_results.csv") %>%
   bind_rows(data.frame(constituency_name=c("Hartlepool", "Chesham And Amersham", 
                                       "Batley And Spen", "North Shropshire",
                                       "Tiverton And Honiton", "Wakefield",
-                                      "City Of Chester"),
-            lab_votes=c(8589, 622, 13296, 3686, 1562, 13166, 17309),
-            lib_votes=c(349, 21517, 1254, 17957, 22537, 508, 2368),
-            con_votes=c(15529, 13489, 12973, 12032, 16393, 8241, 6335),
-            election=c("2021", "2021", "2021", "2021", "2022", "2022", "2022"))) %>% 
+                                      "City Of Chester", "Selby And Ainsty",
+                                      "Uxbridge", "Somerton And Frome"),
+            lab_votes=c(8589, 622, 13296, 3686, 1562, 13166, 17309, 16456, 13470, 1009),
+            lib_votes=c(349, 21517, 1254, 17957, 22537, 508, 2368, 1188, 526, 21187),
+            con_votes=c(15529, 13489, 12973, 12032, 16393, 8241, 6335, 12295, 13965, 10179),
+            election=c("2021", "2021", "2021", "2021", "2022", "2022", "2022", "2023",
+                       "2023", "2023"))) %>% 
   rowwise() %>% 
   #Calculate % of votes going to main parties which went to each one
   mutate(Lab_prop=lab_votes/(lab_votes+con_votes+lib_votes),
@@ -73,13 +79,13 @@ lab <- data.frame(z=c(0,0.5,1/3, 0),
 
 background <- rbind(con, lib, lab)
 
-const <- "City Of Chester"
+const <- "Uxbridge"
 
 plotdata <- data %>% filter(constituency_name==const & election>=1974)
 plottitle <- paste("Electoral shifts in", const, "since", min(plotdata$election))
 
 
-agg_tiff("Outputs/UKElectionsChester.tiff", units="in", width=6, height=6, res=800)
+agg_tiff("Outputs/UKElectionsUxbridge.tiff", units="in", width=6, height=6, res=800)
 ggtern()+
   geom_polygon(data=background, aes(x, y, z,fill=Col), alpha=0.2)+
   theme_hidegrid()+
@@ -96,7 +102,7 @@ ggtern()+
   labs(x="", xarrow="Labour vote %", y="", yarrow="Lib Dem vote %", 
        z="", zarrow="Conservative vote %", 
        title=plottitle,
-       subtitle="Vote share of the 3 main parties in UK general elections and the 2022 by-election")+
+       subtitle="Vote share of the 3 main parties in UK general elections and the 2023 by-election")+
   theme(text=element_text(family="Lato"), plot.title=element_text(face="bold", size=rel(1.5)),
         plot.subtitle=element_text(colour="Grey40"))
 
@@ -134,10 +140,12 @@ Background <- st_read(parl, layer="5 Background") %>%
 
 votes <- st_read(parl, layer="4 Constituencies") %>%
   mutate(constituency_name=to_upper_camel_case(pcon.name, sep_out=" "),
-         constituency_name=if_else(constituency_name=="Richmond Yorks",
-                 "Richmond Yorkshire", constituency_name)) %>% 
+         constituency_name=case_when(
+           constituency_name=="Richmond Yorks" ~ "Richmond Yorkshire",
+           constituency_name=="Uxbridge And South Ruislip" ~ "Uxbridge",
+           TRUE~constituency_name)) %>% 
   filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) %>% 
-  left_join(latest, by="constituency_name", all=TRUE)
+  left_join(latest, by="constituency_name")
 
 Cities <- st_read(parl, layer="3 City outlines") %>% 
   filter(!RegionNati %in% c("Wales", "Scotland", "Northern Ireland")) 
@@ -183,7 +191,7 @@ plot2 <- ggplot()+
   geom_sf(data=votes, aes(geometry=geom, fill=rgb), colour="White", size=0.1)+
   geom_sf(data=Groups, aes(geometry=geom), fill=NA, colour="Black")+
   geom_sf(data=Cities, aes(geometry=geom), fill=NA, colour="Black")+
-  geom_sf(data=votes %>% filter(election==2022), aes(geometry=geom), fill=NA, colour="Red")+
+  geom_sf(data=votes %>% filter(election==2023), aes(geometry=geom), fill=NA, colour="Red")+
   geom_sf_text(data=Group_labels, aes(geometry=geom, label=Group.labe,
                                       hjust=just), size=rel(2.4), colour="Black")+
   scale_fill_identity()+
@@ -203,7 +211,7 @@ plot2 <- ggplot()+
   annotate("text", x=11, y=59, family="Lato", size=rel(4), hjust=0, colour="Grey40",
            label="Every parliamentary constituency in England, coloured by their vote share\nbetween the three major parties in the most recent General or By-Election.")
 
-agg_png("Outputs/UKElectionsTernaryCartogram2022.png", units="in", width=9, height=10, res=800)
+agg_png("Outputs/UKElectionsTernaryCartogram2023.png", units="in", width=9, height=10, res=800)
 plot2
 dev.off()
 
@@ -342,4 +350,6 @@ plot_grid(title,
           nrow=2), ncol=1, rel_heights=c(0.1,1))
 
 dev.off()
+
+
 
