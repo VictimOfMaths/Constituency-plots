@@ -39,12 +39,13 @@ data <- read.csv("C:/Users/cm1cra/Downloads/1918-2019election_results.csv") %>%
                                       "Batley And Spen", "North Shropshire",
                                       "Tiverton And Honiton", "Wakefield",
                                       "City Of Chester", "Selby And Ainsty",
-                                      "Uxbridge", "Somerton And Frome"),
-            lab_votes=c(8589, 622, 13296, 3686, 1562, 13166, 17309, 16456, 13470, 1009),
-            lib_votes=c(349, 21517, 1254, 17957, 22537, 508, 2368, 1188, 526, 21187),
-            con_votes=c(15529, 13489, 12973, 12032, 16393, 8241, 6335, 12295, 13965, 10179),
+                                      "Uxbridge", "Somerton And Frome",
+                                      "Tamworth", "Mid Bedfordshire"),
+            lab_votes=c(8589, 622, 13296, 3686, 1562, 13166, 17309, 16456, 13470, 1009, 11719, 13872),
+            lib_votes=c(349, 21517, 1254, 17957, 22537, 508, 2368, 1188, 526, 21187, 417, 9420),
+            con_votes=c(15529, 13489, 12973, 12032, 16393, 8241, 6335, 12295, 13965, 10179, 10403, 12680),
             election=c("2021", "2021", "2021", "2021", "2022", "2022", "2022", "2023",
-                       "2023", "2023"))) %>% 
+                       "2023", "2023", "2023", "2023")))
   rowwise() %>% 
   #Calculate % of votes going to main parties which went to each one
   mutate(Lab_prop=lab_votes/(lab_votes+con_votes+lib_votes),
